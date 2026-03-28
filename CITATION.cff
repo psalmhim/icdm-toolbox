@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "iCDM Toolbox"
+type: software
+authors:
+  - family-names: Park
+    given-names: Hae-Jeong
+    orcid: ""
+    affiliation: "Yonsei University, Department of Nuclear Medicine"
+  - family-names: Kim
+    given-names: Euisun
+  - family-names: Park
+    given-names: Jiyoung
+  - family-names: Eo
+    given-names: Jinseok
+  - family-names: Lee
+    given-names: Dongha
+license: BSD-3-Clause
+repository-code: ""
+preferred-citation:
+  type: article
+  title: "Individualized Connection Distribution Mapping: A Hierarchical Bayesian Framework for Voxelwise Compositional Connectivity Inference from Diffusion MRI"
+  authors:
+    - family-names: Park
+      given-names: Hae-Jeong
+    - family-names: Kim
+      given-names: Euisun
+    - family-names: Park
+      given-names: Jiyoung
+    - family-names: Eo
+      given-names: Jinseok
+    - family-names: Lee
+      given-names: Dongha
+  journal: "NeuroImage"
+  year: 2026

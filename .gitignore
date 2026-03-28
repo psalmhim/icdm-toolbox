@@ -1,0 +1,7 @@
+*.asv
+*.mat
+*.nii
+*.nii.gz
+*.mex*
+*.o
+.DS_Store
