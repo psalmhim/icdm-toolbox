@@ -99,7 +99,7 @@ If you use this software, please cite:
          Inference from Diffusion MRI},
   author={Park, Hae-Jeong and Kim, Euisun and Park, Jiyoung and
           Eo, Jinseok and Lee, Dongha},
-  journal={NeuroImage},
+  journal={submitted},
   year={2026}
 }
 ```

@@ -5,7 +5,7 @@
 % This software is part of the iCDM framework described in:
 %   Park et al., "Individualized Connection Distribution Mapping:
 %   A Hierarchical Bayesian Framework for Voxelwise Compositional
-%   Connectivity Inference from Diffusion MRI", NeuroImage (2026).
+%   Connectivity Inference from Diffusion MRI" (submitted).
 %
 % Redistribution and use in source and binary forms, with or without
 % modification, are permitted provided that the following conditions
