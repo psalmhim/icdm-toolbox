@@ -26,9 +26,9 @@ iCDM is a MATLAB toolbox for estimating individualized voxelwise compositional c
 ## Installation
 
 1. Download or clone this repository
-2. Add the `icdmcore/` directory to your MATLAB path:
+2. Add `icdmcore/` and all subfolders to your MATLAB path:
    ```matlab
-   addpath('/path/to/icdmcore');
+   addpath(genpath('/path/to/icdmcore'));
    ```
 3. Ensure SPM12 is on your MATLAB path:
    ```matlab
@@ -69,21 +69,35 @@ icdm_check_group(outdir);
 
 ```
 icdmcore/
-  helmert_submatrix.m      % ILR basis construction
-  ilr_inverse.m            % Inverse ILR transform
-  icdm_subject_vb.m        % Subject-level inference (E-step)
-  icdm_population_eb.m     % Iterative EB main loop
-  icdm_update_group_prior.m% Group aggregation (M-step)
-  icdm_init_group_prior.m  % Prior initialisation
-  icdm_estimate_beta*.m    % Covariate regression
-  icdm_gmrf_map.m          % GMRF-regularised MAP
-  spatial_smooth_prior.m   % Spatial smoothing
-  get_prior_native.m       % Covariate-informed prior
-  icdm_warp_to_mni.m       % Native -> MNI warping
-  icdm_warp_to_native.m    % MNI -> native warping
-  icdm_*_plot_*.m          % Visualization functions
-  icdm_kl_js.m             % KL/JS divergence metrics
-  study_icdm_train_hbn*.m  % Example study scripts
+  core/                    % Main toolbox functions
+    helmert_submatrix.m    %   ILR basis construction
+    ilr_inverse.m          %   Inverse ILR transform
+    icdm_subject_vb.m      %   Subject-level inference (E-step)
+    icdm_population_eb.m   %   Iterative EB main loop
+    icdm_update_group_prior.m %  Group aggregation (M-step)
+    icdm_init_group_prior.m%   Prior initialisation
+    icdm_estimate_beta*.m  %   Covariate regression
+    icdm_gmrf_map.m        %   GMRF-regularised MAP
+    spatial_smooth_prior.m %   Spatial smoothing
+    icdm_warp_*.m          %   Spatial normalization (native<->MNI)
+    icdm_kl_js.m           %   KL/JS divergence metrics
+    ...                    %   (all other core functions)
+  plot/                    % Visualization functions
+    icdm_plot_*.m          %   Panel, mosaic, surface plots
+    icdm_display_all.m     %   Full result display
+    icdm_surface_plot.m    %   Cortical surface rendering
+    coolwarm.m             %   Colormap
+  study/                   % Example study scripts
+    study_icdm_train_hbn*.m%   HBN pediatric cohort example
+    study_apply_to_new.m   %   Apply trained model to new data
+    study_sim_reliability.m%   Reliability simulation
+  run/                     % Pipeline runner scripts
+    run_fmri_preprocess*.m %   fMRI preprocessing pipelines
+    run_normalize_tumor*.m %   Tumor normalization pipelines
+    tmp_*.m                %   Development/scratch scripts
+  templates/               % Data templates
+    vtemplate.mat          %   MNI volume template
+  figures/                 % Example output figures
   LICENSE                  % BSD 3-Clause License
   README.md                % This file
 ```
