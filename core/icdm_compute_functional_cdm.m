@@ -1,4 +1,3 @@
-% (c) 2024-2026 Hae-Jeong Park, Yonsei University
 function fcdm = icdm_compute_functional_cdm(subj, K, opts)
 % ICDM_COMPUTE_FUNCTIONAL_CDM  Compute voxelwise functional CDM from rs-fMRI.
 %

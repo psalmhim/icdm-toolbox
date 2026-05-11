@@ -1,4 +1,3 @@
-% (c) 2024-2026 Hae-Jeong Park, Yonsei University
 function plot_distance_comparison(res, outpath)
 % Bar plot: JS divergence by distance bin for all three methods
 

@@ -1,4 +1,3 @@
-% (c) 2024-2026 Hae-Jeong Park, Yonsei University
 function [MU_out, KAP_out, affected_mask] = icdm_extrapolate_prior_in_lesion( ...
     MU_nat, KAP_nat, lesion_vol, idx_native, dim_native, varargin)
 % ICDM_EXTRAPOLATE_PRIOR_IN_LESION  Displacement-aware prior mapping for

@@ -1,4 +1,3 @@
-% (c) 2024-2026 Hae-Jeong Park, Yonsei University
 function val = icdm_validate_structure_function(pi_struct, fcdm, subj, opts)
 % ICDM_VALIDATE_STRUCTURE_FUNCTION  Compare structural iCDM with functional CDM.
 %
