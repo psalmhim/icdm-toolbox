@@ -1,29 +1,8 @@
 function opts = icdm_prepare_design_vector(subjects, opts)
-% ICDM_PREPARE_DESIGN_VECTOR  Pre-compute design metadata (z-scoring, types, splines).
+% Prepare design types, z-scoring, spline metadata.
 %
-%   opts = icdm_prepare_design_vector(subjects, opts)
-%
-%   Inspects the design specification in opts.design_spec and prepares the
-%   normalisation parameters needed by icdm_design_vector.  For each
-%   continuous variable the sample mean and standard deviation are
-%   computed across all subjects and stored in opts.design.mu / sd.
-%   Variable types (continuous / categorical) are inferred automatically
-%   or from naming conventions.  Spline entries store knot metadata.
-%
-%   Example design_spec:
-%     { 'const', 'age', struct('var','age','type','spline','K',3), 'sex' }
-%
-%   Inputs
-%     subjects : [S x 1] struct array with property fields.
-%     opts     : struct containing opts.design_spec.
-%
-%   Output
-%     opts : updated struct with opts.design.mu, opts.design.sd,
-%            opts.design.type, opts.design.spline.
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_DESIGN_VECTOR, BUILD_AGE_SPLINE_BASIS
+% design_spec example:
+%   { 'const', 'age', struct('var','age','type','spline','K',3), 'sex' }
 
 spec = opts.design_spec;
 S = numel(subjects);

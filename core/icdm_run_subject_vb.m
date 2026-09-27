@@ -1,27 +1,5 @@
 function OUTS = icdm_run_subject_vb(subjects, K, grp, opts, iter_dir)
-% ICDM_RUN_SUBJECT_VB  Execute subject-level variational Bayes for all subjects.
-%
-%   OUTS = icdm_run_subject_vb(subjects, K, grp, opts, iter_dir)
-%
-%   Iterates over the subject array and runs icdm_subject_vb for each
-%   subject, caching the result as <sid>_vb.mat in iter_dir.  On
-%   subsequent calls cached results are loaded directly, making the
-%   function safe for interrupted runs.  This constitutes the E-step of
-%   the iCDM population EB algorithm.
-%
-%   Inputs
-%     subjects : [S x 1] struct array from icdm_compose_subject.
-%     K        : number of compositional targets.
-%     grp      : group-level prior struct (from icdm_update_group_prior).
-%     opts     : VB and design options struct.
-%     iter_dir : directory where per-subject VB cache files are stored.
-%
-%   Output
-%     OUTS : {S x 1} cell array of subject VB output structs.
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_SUBJECT_VB, ICDM_POPULATION_EB
+% Run subject-level VB for each subject (with cache).
 S = numel(subjects);
 OUTS = cell(S,1);
 

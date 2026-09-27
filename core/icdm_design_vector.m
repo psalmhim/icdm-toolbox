@@ -1,28 +1,4 @@
 function x = icdm_design_vector(subj, opts)
-% ICDM_DESIGN_VECTOR  Construct a subject's design-matrix row from the design spec.
-%
-%   x = icdm_design_vector(subj, opts)
-%
-%   Evaluates the design specification (opts.design_spec) for a single
-%   subject and returns a numeric row vector.  Supported entry types:
-%     - 'const'       : inserts 1 (intercept).
-%     - character name: retrieves subj.property.<name>, z-scores
-%                       continuous variables using opts.design.mu / sd.
-%     - struct with fields var/K : evaluates a natural cubic spline basis
-%                       for the named variable with K knots.
-%
-%   Inputs
-%     subj : subject struct with subj.property.<name> fields.
-%     opts : options struct containing design_spec, design.type,
-%            design.mu, and design.sd (prepared by
-%            icdm_prepare_design_vector).
-%
-%   Output
-%     x : [1 x P] numeric design-matrix row for this subject.
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_PREPARE_DESIGN_VECTOR, ICDM_ESTIMATE_BETA
 
 spec = opts.design_spec;
 x_list = {};

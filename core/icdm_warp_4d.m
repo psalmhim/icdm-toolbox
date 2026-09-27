@@ -1,27 +1,6 @@
 function Yout = icdm_warp_4d(Yin, nativefile, def_field, templatefile, direction, interp, temp_dir)
-% ICDM_WARP_4D  Warp a 4-D array between native and MNI space via SPM12.
-%
-%   Yout = icdm_warp_4d(Yin, nativefile, def_field, templatefile, direction, interp, temp_dir)
-%
-%   Frame-by-frame warping of a 4-D volume through the DARTEL deformation
-%   field using spm_deformations.  Each 3-D frame is written to a
-%   temporary NIfTI, warped, read back, and cleaned up.
-%
-%   INPUT
-%     Yin          : [X x Y x Z x D] 4-D input array
-%     nativefile   : native-space reference (path or spm_vol struct)
-%     def_field    : path to DARTEL deformation field (y_*.nii)
-%     templatefile : path to DARTEL template NIfTI
-%     direction    : +1 = native-to-MNI, -1 = MNI-to-native
-%     interp       : interpolation order (default 1 = trilinear)
-%     temp_dir     : directory for temporary files (default pwd)
-%
-%   OUTPUT
-%     Yout : warped 4-D single array in the target space
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_APPLY_WARP, GENERIC_WARP_4D, SPM_DEFORMATIONS
+% =========================================================================
+% icdm_warp_4d.m
 
 warning('off','nifti:hdr');
 warning('off','nifti:datatype');

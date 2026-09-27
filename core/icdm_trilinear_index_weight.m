@@ -1,23 +1,4 @@
 function [index8, weight8] = icdm_trilinear_index_weight(x,y,z,dim)
-% ICDM_TRILINEAR_INDEX_WEIGHT  Compute 8-neighbour trilinear indices and weights.
-%
-%   [index8, weight8] = icdm_trilinear_index_weight(x, y, z, dim)
-%
-%   For each query point (x,y,z) computes the eight corner linear indices
-%   and corresponding trilinear interpolation weights within a volume of
-%   size dim.  Out-of-bound coordinates are clipped to the volume edges.
-%
-%   INPUT
-%     x, y, z : [N x 1] continuous voxel coordinates (1-based)
-%     dim     : [1 x 3] volume dimensions [X Y Z]
-%
-%   OUTPUT
-%     index8  : [N x 8] uint32 linear indices of the 8 corners
-%     weight8 : [N x 8] single trilinear weights (rows sum to 1)
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_BUILD_WARP_TO_MNI, ICDM_BUILD_WARP_TO_NATIVE
 
 X = dim(1); Y = dim(2); Z = dim(3);
 
@@ -30,7 +11,7 @@ x0 = max(1,min(X,x0)); x1=max(1,min(X,x1));
 y0 = max(1,min(Y,y0)); y1=max(1,min(Y,y1));
 z0 = max(1,min(Z,z0)); z1=max(1,min(Z,z1));
 
-% *** FIXED: row concatenation to get [Nout × 8] ***
+% row concatenation gives [Nout x 8]
 index8 = uint32([
     sub2ind(dim,x0,y0,z0), ...
     sub2ind(dim,x1,y0,z0), ...

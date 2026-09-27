@@ -1,34 +1,22 @@
 function subj = icdm_compose_subject(icdm, property_names, property_values, name, dartel_template, outpath, opts)
-% ICDM_COMPOSE_SUBJECT  Create and cache a subject struct for the iCDM pipeline.
+% =========================================================================
+% icdm_compose_subject.m  (GENERALIZED ICDM 2025)
 %
-%   subj = icdm_compose_subject(icdm, property_names, property_values,
-%                                name, dartel_template, outpath, opts)
+% Creates and caches:
+%   subj.property.*    = arbitrary fields (age, sex, iq, etc.)
+%   subj.icdm_4d
+%   subj.mask_3d
+%   subj.idx_native
+%   subj.dim_native
+%   subj.dartel_flow
+%   subj.template
 %
-%   Assembles the subject-level data structure used throughout the iCDM
-%   framework.  Demographic covariates are stored as arbitrary key-value
-%   pairs in subj.property, the DARTEL deformation field is located
-%   automatically, and a cached data file (icdm_subj_<name>.mat) is
-%   created containing the WM mask, native indices, and prebuilt
-%   trilinear warp operators.
+%   subj.warp (to_native, to_mni)
+%   subj.datafile  (.mat)
+%   subj.warpfile  (.mat)
 %
-%   Inputs
-%     icdm             : path to the 4-D ICDM NIfTI (native space).
-%     property_names   : cell array of covariate names, e.g. {'age','sex'}.
-%     property_values  : numeric vector of matching covariate values.
-%     name             : subject identifier string.
-%     dartel_template  : path to the DARTEL template NIfTI.
-%     outpath          : directory for cached output files (default: same
-%                        as icdm file).
-%     opts             : optional struct; opts.thresh sets the WM mask
-%                        threshold (default 5).
-%
-%   Output
-%     subj : struct with fields id, icdm_4d, template, property,
-%            dartel_flow, outpath, datafile.
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_BUILD_SUBJECT_WARPS, ICDM_RUN_SUBJECT_VB
+% This replaces fixed age/sex version and fully generalizes metadata.
+% =========================================================================
 
 if nargin < 7, opts = struct(); end
 if nargin < 6, outpath = ''; end

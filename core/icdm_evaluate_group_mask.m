@@ -1,28 +1,20 @@
 function gopts = icdm_evaluate_group_mask(subjects, min_coverage_frac, outfile)
-% ICDM_EVALUATE_GROUP_MASK  Compute the group-level MNI analysis mask from subject coverage.
+% =========================================================================
+% icdm_evaluate_group_mask.m
 %
-%   gopts = icdm_evaluate_group_mask(subjects, min_coverage_frac, outfile)
+% 입력:
+%   subjects          : struct array (icdm_compose_subject 결과)
+%   min_coverage_frac : 예) 0.3
+%   outfile           : output file for saving results
+% 필요:
+%   각 subj.mni_features_mat 에서
+%       dim_mni, idx_mni_mask를 읽어 coverage 계산
 %
-%   For each subject the native WM mask is warped forward to MNI space and
-%   a coverage count is accumulated.  Voxels where at least
-%   min_coverage_frac of all subjects contribute data are retained in the
-%   group analysis mask.  The result is cached to outfile so that
-%   subsequent calls skip the expensive warping step.
-%
-%   Inputs
-%     subjects          : struct array from icdm_compose_subject.
-%     min_coverage_frac : minimum fraction of subjects required
-%                         (e.g. 0.3 = 30 %).  Default 0.3.
-%     outfile           : path to save/load the group mask MAT.
-%
-%   Output
-%     gopts : struct with fields
-%               .dim_mni  [1 x 3] MNI grid dimensions.
-%               .idx_mni  uint32 linear indices of included voxels.
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_COMPOSE_SUBJECT, ICDM_POPULATION_EB
+% 출력:
+%   gopts.dim_mni      : [1x3] MNI dimension
+%   gopts.coverage_mni : logical vector (prod(dim_mni) x 1)
+%   gopts.idx_mni      : find(coverage_mni)
+% =========================================================================
 if nargin<3, outfile = ''; end
 if nargin<2, min_coverage_frac = 0.3; end
 S = numel(subjects);
@@ -39,7 +31,7 @@ if exist(outfile,'file')
 end
 
 fprintf('[GroupMask] Evaluating group MNI coverage over %d subjects...\n', S);
-% Add each subject's MNI mask index to coverage count
+% 각 subject의 MNI mask index를 coverage에 더함
 cov_count=[];
 for s=1:S
     if rem(s,10)==1

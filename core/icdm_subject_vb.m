@@ -1,43 +1,14 @@
 function OUT = icdm_subject_vb(subj, K, grp, opts)
-% ICDM_SUBJECT_VB  Subject-level Newton-Laplace MAP inference in ILR space.
+% ========================================================================
+% icdm_subject_vb.m  (covariate-free MAP/Laplace implementation)
 %
-%   OUT = icdm_subject_vb(subj, K, grp, opts)
-%
-%   Performs voxelwise MAP estimation of ILR coordinates for a single
-%   subject, implementing the E-step of the iterative empirical Bayes
-%   loop (manuscript Section 2: Newton-Laplace inference in ILR space).
-%
-%   For each voxel v, maximises the log-posterior (Eq. log-posterior):
-%     L(y) = ell(n|y) - 0.5*(y-m)'*Lambda*(y-m)
-%   using Newton-CG with backtracking line search (Eqs. grad-voxel,
-%   hess-voxel, newton-linear-system, newton-update).
-%
-%   Posterior precision is approximated via Laplace (Eq. laplace-posterior)
-%   and summarised as kappa = tr(Q)/(K-1) (Eq. def-kappa).
-%
-%   Pipeline:
-%     1. Load native ICDM streamline counts
-%     2. Warp group prior mu, kappa from MNI -> native space
-%     3. Optional: blend covariate-predicted prior (Eq. subject_prior)
-%     4. Voxelwise Newton-Laplace MAP with gamma-tempered initialisation
-%        (Eq. gamma_tempered, Eq. initial_y)
-%     5. Warp posterior y_ilr, kappa back to MNI space
-%
-%   INPUT
-%     subj : struct with fields .id, .datafile or .icdm_4d, .dartel_flow
-%     K    : number of compositional components (e.g. 68)
-%     grp  : group prior struct (.mu_ilr_mni, .kappa_mni, .H, .Beta, ...)
-%     opts : options struct (.gamma, .vb, .precision, .w_beta, ...)
-%
-%   OUTPUT
-%     OUT  : struct with fields
-%       .id          : subject identifier
-%       .y_ilr_mni   : [Nmni x (K-1)] MAP ILR coordinates in MNI space
-%       .kappa_mni   : [Nmni x 1] posterior reliability kappa in MNI space
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_POPULATION_EB, ICDM_UPDATE_GROUP_PRIOR, HELMERT_SUBMATRIX
+%   - Loads native ICDM counts
+%   - Warps group prior μ, κ from MNI -> native
+%   - Covariate-free population prior (covariates are downstream only)
+%   - Voxel-wise MAP estimation with a Laplace covariance approximation
+%   - Warps posterior back to MNI
+%   - Debug visualization if opts.verbose
+% ========================================================================
 
 %fprintf('[VB] Subject %s\n', subj.id);
 H  = grp.H;
@@ -46,7 +17,7 @@ K1 = K - 1;
 % 1. LOAD NATIVE ICDM COUNTS
 if isfield(subj,'datafile') && ~isempty(subj.datafile)
     load(subj.datafile, 'icdm2d', 'warp','idx_native', 'dim_native','V');
-    C_2d=icdm2d(:,subj.idx_regions); 
+    C_2d=icdm2d(:,subj.idx_regions);
     clear icdm2d;
     Vnative=V;
 else
@@ -69,9 +40,18 @@ else
     clear C4 icdm2d;
 end
 
-[Xn, Yn, Zn] = deal(dim_native(1), dim_native(2), dim_native(3));
 Nnat = numel(idx_native);
-gamma = opts.gamma;
+if size(C_2d,1) ~= Nnat || size(C_2d,2) ~= K
+    error('Native count matrix must be [%d x %d], but is [%d x %d].', ...
+        Nnat, K, size(C_2d,1), size(C_2d,2));
+end
+if any(~isfinite(C_2d(:))) || any(C_2d(:) < 0)
+    error('ICDM counts must be finite and nonnegative.');
+end
+gamma = getfield_default(opts,'gamma',1);
+if ~isscalar(gamma) || ~isfinite(gamma) || gamma <= 0
+    error('opts.gamma must be a positive finite scalar.');
+end
 Ct_2d    = (C_2d + 1).^gamma;
 % Normalise to tempered compositions π^(γ)
 Ct_2d = Ct_2d ./ max(sum(Ct_2d,2), eps);
@@ -83,7 +63,9 @@ dim_mni = grp.dim_mni;
 idx_mni = grp.idx_mni;
 fprintf('  Warp group prior MNI -> native...\n');
 % --- μ ---% --- κ ---
-if sum(abs(grp.mu_ilr_mni(:))) == 0 %first iteration
+is_initial = isempty(grp.mu_ilr_mni) || ...
+    (all(isfinite(grp.mu_ilr_mni(:))) && all(grp.mu_ilr_mni(:) == 0));
+if is_initial
     MU_native= zeros(Nnat,K1,'single');
     KAP_native = opts.precision.kappa_base * ones(Nnat,1,'single');
 else
@@ -92,74 +74,60 @@ else
     KAP_native(~isfinite(KAP_native) | KAP_native<=0) = opts.precision.kappa_base;
 end
 
-% 3. LESION-AWARE PRIOR CORRECTION (displacement-aware mapping)
-%    For tumor/lesion cases, the deformation-field-based prior mapping is
-%    unreliable in the affected zone. Extrapolate prior values from nearby
-%    healthy tissue to approximate the pre-displacement prior.
-if isfield(subj, 'Lesion') && ~isempty(subj.Lesion) ...
-        && sum(abs(grp.mu_ilr_mni(:))) > 0
-    les_opts = getfield_default(opts, 'lesion', struct());
-    les_args = {};
-    if isfield(les_opts, 'threshold')
-        les_args = [les_args, {'LesionThreshold', les_opts.threshold}];
+% -------------------------------------------------------------------------
+% General mode (Sec. 2.5.3): OPTIONAL covariate-informed prior MEAN.
+% Default (opts.cov_prior empty): covariate-agnostic testing mode, m_v = mu_grp,
+%   used for ALL reported covariate-effect tests -- Beta^assoc estimated downstream.
+% If a cross-fitted / reference predictive coefficient beta^pred (deviation form,
+% from the data-only representation) is supplied, shift the prior MEAN toward the
+% subject's covariate prediction:  m_v = mu_grp + (beta^pred)' x   (Eq. cov_prior).
+% MEAN-ONLY: the prior precision KAP_native is UNCHANGED (no precision inflation).
+% -------------------------------------------------------------------------
+cov = getfield_default(opts,'cov_prior',[]);
+if ~is_initial && ~isempty(cov) && isfield(cov,'Beta') && ~isempty(cov.Beta) ...
+        && isfield(cov,'x') && ~isempty(cov.x)
+    xs   = double(cov.x(:))';                     % [1 x P] centered covariate for this subject
+    Beta = cov.Beta;                              % [Nmni x K1 x P] deviation-form beta^pred (grp layout)
+    Nmni = numel(grp.idx_mni);
+    pred_mni = zeros(Nmni,K1,'single');
+    for p = 1:size(Beta,3)
+        pred_mni = pred_mni + single( xs(p) * double(Beta(:,:,p)) ); % sum_p x_p * beta^pred_p  (deviation)
     end
-    if isfield(les_opts, 'dilation_radius')
-        les_args = [les_args, {'DilationRadius', les_opts.dilation_radius}];
-    end
-    if isfield(les_opts, 'sigma_vox')
-        les_args = [les_args, {'SigmaVox', les_opts.sigma_vox}];
-    end
-    if isfield(les_opts, 'kappa_attenuation')
-        les_args = [les_args, {'KappaAttenuation', les_opts.kappa_attenuation}];
-    end
-    [MU_native, KAP_native] = icdm_extrapolate_prior_in_lesion( ...
-        MU_native, KAP_native, subj.Lesion, idx_native, dim_native, ...
-        les_args{:});
+    off_native = icdm_warp_to_native(pred_mni,warp,idx_native,idx_mni);
+    off_native(~isfinite(off_native)) = 0;
+    MU_native = MU_native + off_native;           % m_v = mu_grp + (beta^pred)' x  (mean only)
+    fprintf('  [cov-prior] covariate-informed prior MEAN applied (precision unchanged).\n');
 end
 
-% 4. β-FUSION (unchanged)
-w_beta = getfield_default(opts,'w_beta',0);
-if w_beta > 0
-    w_beta = min(max(w_beta,0),1);
-    x = icdm_design_vector(subj, opts);   % [1 × P]
-    Nmni       = numel(grp.idx_mni);
-    pred_mni = zeros(Nmni, K1, 'single');
-    for d = 1:K1
-        Bd = double(squeeze(grp.Beta(:,:,d)));      % [P × Nmni]
-        pred_mni(:,d) = single((x * Bd).');
-    end
-    pMU_wbeta=icdm_warp_to_native(pred_mni,warp,idx_native,idx_mni);
-    if ~isempty(pMU_wbeta)
-        pMU_wbeta(~isfinite(pMU_wbeta)) = 0;
-        rho = w_beta/(1-w_beta);
-        KAP_native = (1+rho).*KAP_native;
-        MU_native  = (1-w_beta).*MU_native + w_beta.*pMU_wbeta;
-    end
-end
+fprintf('  Voxel-wise MAP/Laplace inference...\n');
 
-fprintf('  Voxel-wise VB inference...\n');
-
-% 5. VOXELWISE VB (Newton-Laplace)
+% 5. VOXELWISE MAP + LAPLACE CURVATURE
 vb_opts = opts.vb;
 
 y_nat   = zeros(Nnat,K1,'single');
+y_data_nat = zeros(Nnat,K1,'single');             % data-only ILR (prior-independent) for group mean/dispersion
 kappa_v = zeros(Nnat,1,'single');
+kappa_data_v = zeros(Nnat,1,'single');            % data-only reliability (prior-independent)
 kappa_base=opts.precision.kappa_base;
+alpha_grp = getfield_default(opts.precision,'alpha_grp',1);   % global group-transfer scale (default 1)
+% Group-prior precision is Lambda_v^(s) = alpha_grp * kappa_v^grp * I  (reliability factor omega == 1;
+% the optional phi_Les/phi_N tempering and any baseline elevation are not applied in the reported estimator).
+H2col = H.^2;                                     % [K x K1] for data-curvature
 
 parfor v = 1:Nnat
     % ---------------------------------------------------------
     % 1. Likelihood (raw counts only)
     % ---------------------------------------------------------
-    n_v = C_2d(v,:)';      % RAW streamline counts
+    n_v = double(C_2d(v,:)');      % RAW streamline counts
+    n_v(~isfinite(n_v) | n_v < 0) = 0;
     N_v = sum(n_v);
 
     % ---------------------------------------------------------
     % 2. Prior at voxel v
     % ---------------------------------------------------------
     m_v = MU_native(v,:)';
-    P_v = KAP_native(v)*ones(K1,1,'double');
+    P_v = (alpha_grp*KAP_native(v))*ones(K1,1,'double');
 
-    n_v(~isfinite(n_v)) = 0;
     if ~isfinite(N_v) || N_v<0, N_v=0; end
     m_v(~isfinite(m_v)) = 0;
     P_v(~isfinite(P_v)|P_v<=0) = kappa_base;
@@ -171,7 +139,7 @@ parfor v = 1:Nnat
     y0 = y0_from(m_v, Ct_2d(v,:), H);
 
     % ---------------------------------------------------------
-    % 4. Newton–Raphson VB update
+    % 4. Newton–Raphson MAP update
     % ---------------------------------------------------------
     
     [y_row, kap] = solve_voxel_newton( ...
@@ -184,6 +152,14 @@ parfor v = 1:Nnat
 
     y_nat(v,:) = y_row;
     kappa_v(v) = kap;
+    % data-only reliability: kappa_data = tr(N H'S(pi_data)H)/(K-1) at the count-derived composition (NO prior)
+    pd = n_v / max(N_v,1e-9);
+    hpd = H' * pd;
+    data_diag = N_v * max(sum(H2col.*pd,1)' - hpd.^2, 0);
+    kappa_data_v(v) = single(mean(data_diag));
+    % data-only ILR (prior-independent) for group mean & dispersion (avoids mu/tau feedback)
+    p_reg = (n_v+0.5) / (N_v + 0.5*K);
+    y_data_nat(v,:) = single((log(p_reg))'*H);
 end
 
 
@@ -193,6 +169,19 @@ y_ilr_mni =icdm_warp_to_mni(y_nat,warp,idx_mni,idx_native);
 y_ilr_mni (~isfinite(y_ilr_mni )) = 0;
 kappa_mni =icdm_warp_to_mni(kappa_v,warp,idx_mni,idx_native);
 kappa_mni(~isfinite(kappa_mni) | kappa_mni<=0) = opts.precision.kappa_base;
+kappa_data_mni = icdm_warp_to_mni(kappa_data_v,warp,idx_mni,idx_native);
+kappa_data_mni(~isfinite(kappa_data_mni) | kappa_data_mni<=0) = opts.precision.kappa_base;
+y_data_mni = icdm_warp_to_mni(y_data_nat,warp,idx_mni,idx_native);
+support_native = ones(Nnat,1,'single');
+support_mni = icdm_warp_to_mni(support_native,warp,idx_mni,idx_native);
+support_mni = support_mni(:);
+support_thresh = getfield_default(opts,'warp_support_thresh',0.5);
+valid_mni = isfinite(support_mni) & support_mni >= support_thresh;
+y_data_mni(~isfinite(y_data_mni)) = NaN;
+y_data_mni(~repmat(valid_mni,1,K1)) = NaN;
+kappa_data_mni(~valid_mni) = NaN;
+y_ilr_mni(~repmat(valid_mni,1,K1)) = NaN;
+kappa_mni(~valid_mni) = NaN;
 
 % 7. DEBUG VISUALIZATION
 
@@ -209,7 +198,10 @@ OUT.id            = subj.id;
 %OUT.y_ilr_native  = y_nat;
 %OUT.kappa_native  = kappa_v;
 OUT.y_ilr_mni     = y_ilr_mni;
-OUT.kappa_mni     = kappa_mni;
+OUT.kappa_mni     = kappa_mni;          % posterior reliability (data + prior) — OUTPUT/reporting only
+OUT.kappa_data_mni = kappa_data_mni;    % data-only reliability for QC/reporting (not population homogeneity)
+OUT.y_data_mni    = y_data_mni;         % data-only ILR — used for group mean & dispersion (no mu/tau feedback)
+OUT.valid_mni     = valid_mni;
 
 end  % -------------------- END MAIN FUNCTION -----------------------------
 
@@ -291,24 +283,27 @@ for it = 1:vb.max_iter
     end
 
     alpha = 1.0;
-    F0 = voxel_obj(y,n,N,m,Pdiag,H);
+    F0 = voxel_logpost(y,n,N,m,Pdiag,H);
+    accepted = false;
     for b = 1:10
         y_try = y + alpha*step;
-        F_try = voxel_obj(y_try,n,N,m,Pdiag,H);
+        F_try = voxel_logpost(y_try,n,N,m,Pdiag,H);
         if F_try >= F0
             y = y_try;
+            accepted = true;
             break;
         end
         alpha = alpha*0.5;
     end
+    if ~accepted, break; end
 end
 
 z = H*y;
 [~, mu] = logsumexp_softmax(z);
 mu = max(mu,1e-12);
 Hd2 = sum((H.^2).*mu,1)';
-
-Qdiag = Pdiag + N*Hd2 + 1e-12;
+Hmu = H' * mu;
+Qdiag = Pdiag + N*max(Hd2 - Hmu.^2,0) + 1e-12;
 
 kappa_scalar = single(mean(Qdiag));
 y_row = single(y');
@@ -372,19 +367,14 @@ end
 
 %% helper: F(y)
 
-function Fv = voxel_obj(y, n, N, m, Pdiag, H)
+function Fv = voxel_logpost(y, n, N, m, Pdiag, H)
 
 z = H*y;
-[lse, mu] = logsumexp_softmax(z);
+[lse, ~] = logsumexp_softmax(z);
 
 ll = n'*z - N*lse;
-lp = -0.5*(y-m)'*(Pdiag.*(y-m)) + 0.5*sum(log(Pdiag));
-
-mu = max(mu,1e-12);
-Hd2 = sum((H.^2).*mu,1)';
-Qdiag = Pdiag + N*Hd2 + 1e-12;
-
-Fv = ll + lp - 0.5*sum(log(Qdiag));
+lp = -0.5*(y-m)'*(Pdiag.*(y-m));
+Fv = ll + lp;
 
 end
 
@@ -404,10 +394,9 @@ end
 
 %% y0 initialization from empirical proportions
 
-function y0 = y0_from(m, n, H)
-n = double(n(:));
-alpha = n + 1;
-pi0 = alpha / sum(alpha);
+function y0 = y0_from(m, p, H)
+p = double(p(:));
+pi0 = p / max(sum(p),realmin('double'));
 
 z0 = log(max(pi0, realmin('double')));
 z0 = z0 - mean(z0);

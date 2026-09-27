@@ -6,3 +6,5 @@
 *.o
 .DS_Store
 run/
+__pycache__/
+*.pyc

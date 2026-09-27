@@ -1,23 +1,16 @@
 function grp = icdm_init_group_prior(K, outdir, opts)
-% ICDM_INIT_GROUP_PRIOR  Initialise group-level prior for iterative EB.
+% =========================================================================
+% icdm_init_group_prior.m
 %
-%   grp = icdm_init_group_prior(K, outdir, opts)
+% 인덱스 기반 초기 group prior 생성
 %
-%   Creates the initial group prior structure for the first EB iteration.
-%   Prior mean mu is initialised to zero (uninformative), prior precision
-%   kappa to a baseline value, and covariate effects Beta to zero.
+%   grp.mu_ilr_mni : [Nmni x (K-1)] 초기 0
+%   grp.kappa_mni  : [Nmni x 1]      = kappa_base
+%   grp.beta       : [(K-1) x P]     = 0 (covariate effect)
+%   grp.H          : [K x (K-1)] Helmert matrix
 %
-%   OUTPUT fields:
-%     grp.mu_ilr_mni : [Nmni x (K-1)] initial group mean (zeros)
-%     grp.kappa_mni  : [Nmni x 1]     initial precision (= kappa_base)
-%     grp.Beta       : [P x Nmni x (K-1)] initial covariate effects (zeros)
-%     grp.H          : [K x (K-1)]    Helmert submatrix
-%     grp.idx_mni    : MNI-space voxel indices
-%     grp.dim_mni    : MNI volume dimensions
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_POPULATION_EB, HELMERT_SUBMATRIX
+% (disk에 group_prior.mat으로도 저장)
+% =========================================================================
 Nmni = numel(opts.idx_mni);
 K1   = K - 1;
 P    = numel(opts.design_spec) - 1;      % slopes only (age)

@@ -1,10 +1,11 @@
 function Ymni = icdm_warp_to_mni(Ynat, warpobj, idx_mni,idx_native,interp)
-% ICDM_WARP_TO_MNI  Fast native-to-MNI warping via prebuilt trilinear operator.
+% ======================================================================
+% icdm_warp_to_mni
 %
-%   Ymni = icdm_warp_to_mni( Ynative, warpobj, idx_mni, idx_native, interp )
+%   Ymni = icdm_warp_to_mni( Ynative, warpobj, idx_mni,idx_native, interp )
 %
-%   Fast warping of native-space data to MNI-space data using a
-%   prebuilt trilinear warp operator (warpobj.to_mni).
+%   Fast warping of native-space data → MNI-space data using a
+%   **pre-built trilinear warp operator** (warpobj.to_mni).
 %
 %   Used to obtain subject-level results in MNI space:
 %       • Posterior ILR mean (y_ilr_native → y_ilr_mni)
@@ -75,9 +76,6 @@ function Ymni = icdm_warp_to_mni(Ynat, warpobj, idx_mni,idx_native,interp)
 %   label warping is usually not required, but can be added if needed.
 %
 % ----------------------------------------------------------------------
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_WARP_TO_NATIVE, ICDM_APPLY_WARP, ICDM_BUILD_WARP_TO_MNI
 % ======================================================================
 
 if nargin <5, interp=1; end

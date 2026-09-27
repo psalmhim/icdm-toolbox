@@ -1,24 +1,11 @@
 function subjects = icdm_build_subject_warps(subjects)
-% ICDM_BUILD_SUBJECT_WARPS  Build or load trilinear warp operators for all subjects.
+% =========================================================================
+% icdm_build_subject_warps.m
 %
-%   subjects = icdm_build_subject_warps(subjects)
-%
-%   Iterates over the subject struct array and ensures that each subject
-%   has precomputed forward (native-to-MNI) and backward (MNI-to-native)
-%   trilinear warp operators stored in its data file.  If the data file
-%   already exists the warp is loaded; otherwise the ICDM 4-D volume is
-%   read, a WM mask is computed, and both warp operators are built via
-%   icdm_build_warp_to_native / icdm_build_warp_to_mni and saved.
-%
-%   Input / Output
-%     subjects : struct array produced by icdm_compose_subject.
-%                On return, each element has a valid datafile containing
-%                the warp operators.
-%
-%   Author: Hae-Jeong Park, Ph.D.
-%
-%   See also ICDM_COMPOSE_SUBJECT, ICDM_BUILD_WARP_TO_MNI,
-%            ICDM_BUILD_WARP_TO_NATIVE
+% 입력:
+%   subjects          : struct array (icdm_compose_subject 결과)
+% 출력:
+%   subjects          : struct array (warp operator 추가됨)
 
 S = numel(subjects);
 if S == 0

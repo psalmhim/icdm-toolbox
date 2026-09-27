@@ -5,21 +5,26 @@ type: software
 authors:
   - family-names: Park
     given-names: Hae-Jeong
-    orcid: ""
-    affiliation: "Yonsei University, Department of Nuclear Medicine"
+    affiliation: "Yonsei University College of Medicine"
   - family-names: Kim
     given-names: Euisun
   - family-names: Park
     given-names: Jiyoung
+  - family-names: Lee
+    given-names: Joonho
+  - family-names: Lee
+    given-names: Dongmyeong
   - family-names: Eo
     given-names: Jinseok
   - family-names: Lee
     given-names: Dongha
+  - family-names: Jeong
+    given-names: Seok-Oh
 license: BSD-3-Clause
-repository-code: ""
+repository-code: "https://github.com/psalmhim/icdm-toolbox"
 preferred-citation:
   type: article
-  title: "Individualized Connection Distribution Mapping: A Hierarchical Bayesian Framework for Voxelwise Compositional Connectivity Inference from Diffusion MRI"
+  title: "Voxelwise White-Matter Compositional Connectivity Mapping from Diffusion MRI via Reliability-Aware Hierarchical Inference"
   authors:
     - family-names: Park
       given-names: Hae-Jeong
@@ -27,9 +32,15 @@ preferred-citation:
       given-names: Euisun
     - family-names: Park
       given-names: Jiyoung
+    - family-names: Lee
+      given-names: Joonho
+    - family-names: Lee
+      given-names: Dongmyeong
     - family-names: Eo
       given-names: Jinseok
     - family-names: Lee
       given-names: Dongha
-  journal: "submitted"
+    - family-names: Jeong
+      given-names: Seok-Oh
+  journal: "Medical Image Analysis (under review)"
   year: 2026
