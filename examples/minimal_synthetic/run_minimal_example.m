@@ -42,10 +42,9 @@ opts.gamma = 0.35; opts.max_iter = 2; opts.tol = 1e-3; opts.ridge_lambda = 1e-2;
 opts.precision = struct('kappa_base',1.0,'prior_eps2',1e-6,'wbeta_prec',false,'alpha_grp',0.25);
 opts.vb  = struct('max_iter',20,'pcg_iter',20,'tol_grad',1e-6,'tol_step',1e-6,'jitter',1e-6,'init','hybrid','parfor',false);
 opts.agg = struct('trim_alpha',0.20,'min_kappa',1e-4,'min_subj',3,'min_subjects',3,'verbose',0);
-opts.w_beta = 0; opts.verbose = 0; opts.n_perm = 100;
+opts.w_beta = 0; opts.verbose = 0;
 opts.spatial_group = struct('use',true,'lambda',0.5,'neighborhood',6);
 opts.paths.temp_dir = fullfile(outdir,'tmp'); if ~exist(opts.paths.temp_dir,'dir'), mkdir(opts.paths.temp_dir); end
-opts.grp_kappa_thresh = 0; opts.estimator = 'ols';
 for s = 1:S
     si = icdm_compose_subject(counts{s}, {'age'}, age(s), names{s}, template, fullfile(outdir,'subjs'), opts);
     si.idx_regions = targets;
@@ -55,7 +54,6 @@ end
 gopts = icdm_evaluate_group_mask(subjects, 0.3, fullfile(outdir,'group_mask.mat'));
 opts.idx_mni = gopts.idx_mni; opts.dim_mni = gopts.dim_mni;
 subjects = icdm_build_subject_warps(subjects);
-opts.design_spec = {'const','age'}; opts = icdm_prepare_design_vector(subjects, opts);
 grp = icdm_init_group_prior(numel(targets), outdir, opts);
 icdm_population_eb(subjects, numel(targets), outdir, opts, grp);
 

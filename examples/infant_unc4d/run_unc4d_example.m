@@ -64,13 +64,13 @@ opts.precision = struct('kappa_base',1.0,'prior_eps2',fx.variance_floor,'wbeta_p
 opts.vb  = struct('max_iter',20,'pcg_iter',20,'tol_grad',1e-6,'tol_step',1e-6,'jitter',1e-6,'init','hybrid','parfor',false);
 opts.agg = struct('trim_alpha',fx.trim_alpha,'min_kappa',1e-4,'min_subj',3,'min_subjects',3,'verbose',0);
 opts.spatial_group = struct('use',true,'lambda',fx.spatial_smoothing_eta,'neighborhood',6);
-opts.w_beta = 0; opts.verbose = 0; opts.n_perm = 100; opts.grp_kappa_thresh = 0; opts.estimator = 'ols';
+opts.w_beta = 0; opts.verbose = 0;
 pd = fullfile(der,'prior'); if ~exist(fullfile(pd,'subjs'),'dir'), mkdir(fullfile(pd,'subjs')); end
 opts.paths.temp_dir = fullfile(pd,'tmp'); if ~exist(opts.paths.temp_dir,'dir'), mkdir(opts.paths.temp_dir); end
 
 ids = strcat(T.participant_id, '_', T.session_id);
 for i = 1:n
-    si = icdm_compose_subject(counts{i}, {'age'}, T.age_months(i), ids{i}, common, fullfile(pd,'subjs'), opts);   % age in months
+    si = icdm_compose_subject(counts{i}, {'age_months'}, T.age_months(i), ids{i}, common, fullfile(pd,'subjs'), opts);
     si.idx_regions = targets;
     if i == 1, subjects = repmat(si,n,1); end
     subjects(i) = si;
@@ -84,7 +84,6 @@ end
 gopts = icdm_evaluate_group_mask(subjects(ref), fx.group_coverage, fullfile(pd,'group_mask.mat'));
 opts.idx_mni = gopts.idx_mni; opts.dim_mni = gopts.dim_mni;
 subjects = icdm_build_subject_warps(subjects);
-opts.design_spec = {'const','age'}; opts = icdm_prepare_design_vector(subjects(ref), opts);
 grp0 = icdm_init_group_prior(K, pd, opts);
 icdm_population_eb(subjects(ref), K, pd, opts, grp0);
 prior_file = fullfile(pd,'group_icdm_iter_002.mat');

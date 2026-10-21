@@ -33,8 +33,6 @@ opts.agg = struct('trim_alpha',0.20,'min_kappa',1e-4,'min_subj',3,'min_subjects'
 opts.w_beta = 0;                                   % covariate-agnostic prior (association-testing mode)
 opts.spatial_group = struct('use',true,'lambda',0.5,'neighborhood',6);   % group-prior smoothing (eta)
 opts.paths.temp_dir = fullfile(outdir,'tmp'); if ~exist(opts.paths.temp_dir,'dir'), mkdir(opts.paths.temp_dir); end
-opts.grp_kappa_thresh = 0;
-opts.estimator = 'ols';        % downstream association by ordinary least squares
 opts.verbose = 0;
 
 % ---- 1. count-derived subject representations (native -> template) -----------------
@@ -51,8 +49,6 @@ end
 gopts = icdm_evaluate_group_mask(subjects, 0.3, fullfile(outdir,'group_mask.mat'));
 opts.idx_mni = gopts.idx_mni; opts.dim_mni = gopts.dim_mni;
 subjects = icdm_build_subject_warps(subjects);
-opts.design_spec = [{'const'} covariates.names(1)];
-opts = icdm_prepare_design_vector(subjects, opts);
 
 % ---- 3. population prior (estimated once) and subject-level Newton--Laplace inference -
 grp = icdm_init_group_prior(K, outdir, opts);

@@ -53,4 +53,4 @@ derivatives/icdm/
                                     alpha_grp, valid voxels, median kappa_data / kappa_post / r_data, estimate file
 ```
 
-`trajectory_table.tsv` indexes the per-visit estimates for longitudinal models, for example mixed-effects models of the ILR coordinates with a participant random effect. The toolbox's own downstream association (`icdm_estimate_beta`) is cross-sectional.
+`trajectory_table.tsv` indexes the per-visit estimates for longitudinal models, for example mixed-effects models of the ILR coordinates with a participant random effect.

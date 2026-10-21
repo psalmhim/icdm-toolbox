@@ -16,7 +16,7 @@ iCDM treats the voxelwise streamline--target counts produced by a tractography p
   - `kappa_data` -- prior-independent data information (likelihood curvature at the relative streamline frequencies);
   - `kappa_post` -- posterior certainty (mean posterior curvature at the MAP);
   - `r_data = tr(Q_data) / tr(Q_post)` -- fraction of posterior precision supplied by the subject's own counts. With the isotropic prior, `r_data = 1 - alpha_grp * lambda_grp / kappa_post`.
-- **Subject characteristics.** Two modes: (i) *association testing* -- the characteristic under test is excluded from the prior and estimated downstream on the inferred ILR coordinates (ordinary least squares, permutation-based TFCE / cluster-extent FWE, Freedman--Lane for nuisance covariates); (ii) *individualized reference* -- an independently learned or cross-fitted coefficient field `beta_pred` shifts the prior mean (optional; off by default).
+- **Subject characteristics.** Two modes: (i) *association testing* -- the characteristic under test is excluded from the prior and analysed downstream on the saved subject estimates (in the paper: ordinary least squares on the ILR coordinates with age-permutation TFCE, cluster-extent and tract-level family-wise error control); (ii) *individualized reference* -- an independently learned or cross-fitted coefficient field `beta_pred` shifts the prior mean (optional; off by default).
 
 ## Requirements
 
@@ -61,8 +61,7 @@ run_minimal_example('/tmp/icdm_minimal');   % about one minute; checks its outpu
 | `icdm_population_eb.m` | driver: population prior from count-derived representations, then subject-level inference under the fixed prior |
 | `icdm_update_group_prior.m` | robust group mean and dispersion, group precision, spatial smoothing |
 | `icdm_run_subject_vb.m`, `icdm_subject_vb.m` | subject-level Newton--CG MAP, Laplace curvature, `kappa_data`, `kappa_post` |
-| `icdm_prepare_design_vector.m`, `icdm_design_vector.m` | design assembly for downstream association |
-| `icdm_estimate_beta.m`, `icdm_beta_estimator.m`, `icdm_fl_oneperm.m`, `icdm_tfce.m` | downstream association on inferred ILR coordinates with permutation inference |
+| `icdm_tfce.m` | threshold-free cluster enhancement for downstream voxelwise statistics |
 | `icdm_posterior_support.m` | template-space `N_v`, `kappa_data`, `kappa_post`, `r_data` and validity mask per subject |
 | `icdm_select_alpha.m` | covariate-free calibration of `alpha_grp` (cross-validated predictive and marginal likelihood) |
 | `getfield_default.m` | option defaults |
