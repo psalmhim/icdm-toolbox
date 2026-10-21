@@ -12,7 +12,7 @@ function run_icdm_example(icdm_files, names, covariates, template, outdir)
 % The population prior is estimated once from prior-independent count-derived
 % representations and held fixed during subject-level inference.
 
-if ~exist(outdir,'dir'), mkdir(outdir); end
+if ~exist(fullfile(outdir,'subjs'),'dir'), mkdir(fullfile(outdir,'subjs')); end
 S = numel(icdm_files);
 idx_regions = 1:68;                                   % Desikan--Killiany cortical targets
 

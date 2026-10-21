@@ -29,15 +29,31 @@ iCDM treats the voxelwise streamline--target counts produced by a tractography p
 
 ```
 core/         method (MATLAB)
-examples/     run_icdm_example.m -- end-to-end driver with the settings used in the paper
+atlas/        84-target label conversion and channel lookup tables
+docs/         input/output contract; guide for new populations and templates
+examples/     run_icdm_example.m -- cohort driver with the settings used in the paper
+              minimal_synthetic/ -- executable tractogram-to-estimate example with reference outputs
+              infant_unc4d/      -- configurable longitudinal workflow with age-specific templates
 simulation/   simulation scripts (Python)
 ```
+
+## Quick start
+
+```matlab
+addpath('/path/to/spm');
+addpath('/path/to/icdm-toolbox/examples/minimal_synthetic');
+run_minimal_example('/tmp/icdm_minimal');   % about one minute; checks its outputs against expected_outputs.json
+```
+
+- `docs/CONTRACT.md` -- inputs, the streamline-to-count rules, target channel order, spatial conventions, validity masks and outputs (`kappa_data`, `kappa_post`, `r_data`).
+- `docs/NEW_POPULATION.md` -- template selection, mapping to a common space, reference-sample selection, prior construction, calibration of `alpha_grp`, and subject/visit organisation (worked through in `examples/infant_unc4d`).
 
 ### `core/`
 
 | file | role |
 |---|---|
-| `icdm_compose_subject.m` | voxelize a count map into streamline--target incidence counts and prepare the subject record |
+| `icdm_tracks_to_counts.m` | tractogram (`.tck`/`.trk`) + label image -> voxelwise streamline--target incidence counts |
+| `icdm_compose_subject.m` | read a count image, apply the native validity threshold and prepare the subject record and warps |
 | `helmert_submatrix.m` | orthonormal Helmert basis of the ILR transform |
 | `icdm_evaluate_group_mask.m`, `icdm_build_subject_warps.m` | template-space analysis domain and native <-> template warp tables |
 | `icdm_build_warp_to_mni.m`, `icdm_build_warp_to_native.m`, `icdm_warp_to_mni.m`, `icdm_warp_to_native.m`, `icdm_warp_4d.m`, `icdm_apply_warp.m`, `icdm_trilinear_index_weight.m` | spatial transport of ILR fields and prior parameters |
@@ -47,6 +63,8 @@ simulation/   simulation scripts (Python)
 | `icdm_run_subject_vb.m`, `icdm_subject_vb.m` | subject-level Newton--CG MAP, Laplace curvature, `kappa_data`, `kappa_post` |
 | `icdm_prepare_design_vector.m`, `icdm_design_vector.m` | design assembly for downstream association |
 | `icdm_estimate_beta.m`, `icdm_beta_estimator.m`, `icdm_fl_oneperm.m`, `icdm_tfce.m` | downstream association on inferred ILR coordinates with permutation inference |
+| `icdm_posterior_support.m` | template-space `N_v`, `kappa_data`, `kappa_post`, `r_data` and validity mask per subject |
+| `icdm_select_alpha.m` | covariate-free calibration of `alpha_grp` (cross-validated predictive and marginal likelihood) |
 | `getfield_default.m` | option defaults |
 
 ## Usage
@@ -59,7 +77,7 @@ covariates.values = [age(:) sex(:)];
 run_icdm_example(icdm_files, names, covariates, '/path/to/template.nii', 'out');
 ```
 
-`icdm_files` are per-subject 4-D images of streamline--target counts (voxel x target) in native diffusion space. The example uses the settings of the reported analyses: `alpha_grp = 0.25`, trimming fraction 0.2, group-prior smoothing `eta = 0.5` (6-connected), variance floor 1e-6, precision cap 1e4, Newton--CG with at most 20 iterations. The population-transfer strength `alpha_grp` should be calibrated for each new dataset with criteria that do not use the effect under test (e.g. cross-validated predictive likelihood).
+`icdm_files` are per-subject 4-D images of streamline--target counts (voxel x target) in native diffusion space, as written by `icdm_tracks_to_counts`; each needs its SPM deformation at `<folder>/dartel/y_fs_t1.nii` (see `docs/CONTRACT.md`). The example uses the settings of the reported analyses: `alpha_grp = 0.25`, trimming fraction 0.2, group-prior smoothing `eta = 0.5` (6-connected), variance floor 1e-6, precision cap 1e4, Newton--CG with at most 20 iterations. The population-transfer strength `alpha_grp` should be calibrated for each new dataset with criteria that do not use the effect under test (`icdm_select_alpha`).
 
 Per-subject outputs (`<outdir>/iter_002/<name>_vb.mat`) include the MAP ILR coordinates (`y_ilr_mni`), the count-derived coordinates (`y_data_mni`), `kappa_data_mni`, `kappa_mni` (posterior certainty) and the validity mask `valid_mni`.
 

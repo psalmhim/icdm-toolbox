@@ -1,0 +1,47 @@
+{
+  "description": "iCDM configuration for longitudinal infant data with age-specific UNC-4D templates. Replace every path under 'templates' and 'common_space' with the local UNC-4D files; the synthetic example overwrites them with generated stand-ins.",
+  "bids_root": "data",
+  "sessions_table": "data/sessions.tsv",
+  "derivatives": "derivatives/icdm",
+
+  "targets": {
+    "label_image_per_session": "sub-{sub}/ses-{ses}/dwi/atlas.nii",
+    "lookup_table": "../../atlas/target_lookup_68.tsv",
+    "model_channels": [1, 2, 3, 4, 5, 6],
+    "note": "Label value k = channel k. For FreeSurfer/infant-FreeSurfer parcellations use atlas/icdm_remap_dk84.m and model channels 1-68."
+  },
+
+  "tractography": {
+    "tractogram_per_session": "sub-{sub}/ses-{ses}/dwi/tracts.tck",
+    "note": "Tractography is upstream of iCDM; use one fixed protocol (algorithm, streamline budget, seeding) for every visit."
+  },
+
+  "templates": [
+    {"name": "month03", "age_months": [0, 4.5],  "template": "templates/month03.nii", "to_common": "templates/y_common_to_month03.nii"},
+    {"name": "month06", "age_months": [4.5, 9],  "template": "templates/month06.nii", "to_common": "templates/y_common_to_month06.nii"},
+    {"name": "month12", "age_months": [9, 18],   "template": "templates/month12.nii", "to_common": "templates/y_common_to_month12.nii"}
+  ],
+  "subject_to_template_deformation": "sub-{sub}/ses-{ses}/xfm/y_to_{template}.nii",
+  "common_space": {"name": "month12", "template": "templates/common.nii"},
+
+  "reference": {
+    "column": "reference",
+    "prior_mode": "pooled",
+    "note": "pooled = one covariate-agnostic prior from all reference visits (required when age is the effect under test); per_age_bin = one prior per template bin (individualized reference only; it encodes age)."
+  },
+
+  "calibration": {
+    "alpha_grp": "cv",
+    "alpha_grp_fixed": 0.25,
+    "cv_folds": 5,
+    "cv_group_by": "participant_id",
+    "fixed": {
+      "trim_alpha": 0.20,
+      "spatial_smoothing_eta": 0.5,
+      "variance_floor": 1e-6,
+      "precision_cap": 1e4,
+      "native_count_threshold": 5,
+      "group_coverage": 0.3
+    }
+  }
+}

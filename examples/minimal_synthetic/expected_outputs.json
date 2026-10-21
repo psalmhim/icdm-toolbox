@@ -1,0 +1,77 @@
+{
+  "n_group_voxels": 10206,
+  "subjects": [
+    {
+      "id": "sub-01",
+      "n_native_valid": 9514,
+      "n_template_valid": 9095,
+      "N_total": 170149,
+      "kappa_data_median": 1.8285714387893677,
+      "kappa_post_median": 3.76379132270813,
+      "r_data_median": 0.53522823656654128
+    },
+    {
+      "id": "sub-02",
+      "n_native_valid": 9446,
+      "n_template_valid": 9067,
+      "N_total": 175714,
+      "kappa_data_median": 1.8571428060531616,
+      "kappa_post_median": 3.8050405979156494,
+      "r_data_median": 0.53890699058327007
+    },
+    {
+      "id": "sub-03",
+      "n_native_valid": 9271,
+      "n_template_valid": 8908,
+      "N_total": 174235,
+      "kappa_data_median": 1.8857142925262451,
+      "kappa_post_median": 3.8268672227859497,
+      "r_data_median": 0.54055659541903345
+    },
+    {
+      "id": "sub-04",
+      "n_native_valid": 9544,
+      "n_template_valid": 9145,
+      "N_total": 172952,
+      "kappa_data_median": 1.8571428060531616,
+      "kappa_post_median": 3.7872092723846436,
+      "r_data_median": 0.53884768366883551
+    },
+    {
+      "id": "sub-05",
+      "n_native_valid": 9527,
+      "n_template_valid": 9080,
+      "N_total": 172428,
+      "kappa_data_median": 1.8285714387893677,
+      "kappa_post_median": 3.7676565647125244,
+      "r_data_median": 0.53475319407418787
+    },
+    {
+      "id": "sub-06",
+      "n_native_valid": 9264,
+      "n_template_valid": 8884,
+      "N_total": 174538,
+      "kappa_data_median": 1.8857142925262451,
+      "kappa_post_median": 3.8299863338470459,
+      "r_data_median": 0.54049129017550257
+    },
+    {
+      "id": "sub-07",
+      "n_native_valid": 9142,
+      "n_template_valid": 8829,
+      "N_total": 176352,
+      "kappa_data_median": 1.8571428060531616,
+      "kappa_post_median": 3.8041379451751709,
+      "r_data_median": 0.54147210109528621
+    },
+    {
+      "id": "sub-08",
+      "n_native_valid": 9222,
+      "n_template_valid": 8894,
+      "N_total": 176280,
+      "kappa_data_median": 1.8857142925262451,
+      "kappa_post_median": 3.80460786819458,
+      "r_data_median": 0.540015846269416
+    }
+  ]
+}
