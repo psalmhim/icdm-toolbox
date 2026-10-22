@@ -2,10 +2,16 @@
 
 This guide follows `examples/infant_unc4d/run_unc4d_example.m`, a configurable longitudinal workflow for infant data with age-specific UNC-4D templates (`unc4d_config.json`). The example runs on small synthetic inputs. It demonstrates configuration and data organisation; it is not a validation of iCDM in infant data.
 
+UNC-4D refers to the UNC/UMN 4D infant brain volumetric atlas built from the Baby Connectome Project cohort:
+
+> Chen L, Wu Z, Hu D, Wang Y, Zhao F, Zhong T, Lin W, Wang L, Li G. A 4D infant brain volumetric atlas based on the UNC/UMN Baby Connectome Project (BCP) cohort. *NeuroImage*. 2022;253:119097. https://doi.org/10.1016/j.neuroimage.2022.119097
+
+The atlas is distributed at https://www.nitrc.org/projects/uncbcp_4d_atlas/. See that page for the current release (later versions extend the age range beyond the published one) and its terms of use.
+
 ## 1. Upstream data
 
 - Use one tractography protocol for every subject and visit (algorithm, streamline budget, seeding, termination). iCDM models the counts this protocol produces; it does not correct differences between protocols.
-- Provide a target label image per visit in the tractogram's world space, with the channel order of `atlas/target_lookup_68.tsv` or `_84.tsv` (Section 3 of `docs/CONTRACT.md`). Infant parcellations must be mapped to the same channel list at every age.
+- Provide a target label image per visit in the tractogram's world space, with the channel order of `atlas/target_lookup_68.tsv` or `_84.tsv` (Section 3 of `docs/CONTRACT.md`). Infant parcellations must be mapped to the same channel list at every age. The UNC/UMN 4D atlas provides the Desikan cortical parcellation, mapped consistently across ages, together with subcortical labels, which can serve as the basis for the Desikan–Killiany target channels.
 
 ## 2. Template selection
 

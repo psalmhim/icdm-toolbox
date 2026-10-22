@@ -9,4 +9,4 @@ TT = run_unc4d_example('/tmp/icdm_unc4d');                  % synthetic data + u
 TT = run_unc4d_example('/my/study', 'my_config.json');      % your data, same layout
 ```
 
-`unc4d_config.json` sets the template age bins and files, the deformations, the common analysis space, the reference column, the prior mode, and the calibration. Replace the template paths with your local UNC-4D files. The steps, from template selection to `trajectory_table.tsv`, are described in `docs/NEW_POPULATION.md`.
+`unc4d_config.json` sets the template age bins and files, the deformations, the common analysis space, the reference column, the prior mode, and the calibration. Replace the template paths with your local UNC-4D files (UNC/UMN 4D infant brain atlas, Chen et al., *NeuroImage* 2022;253:119097, https://doi.org/10.1016/j.neuroimage.2022.119097; download: https://www.nitrc.org/projects/uncbcp_4d_atlas/). The steps, from template selection to `trajectory_table.tsv`, are described in `docs/NEW_POPULATION.md`.
