@@ -6,6 +6,8 @@ function T = test_counting_rules(workdir)
 %   channel 2 : slab i = 11..12    (cortical target, "right")
 %   channel 3 : voxels i = 6, j = 6..7, k = 6..7   (subcortical structure inside the white matter)
 % Seven hand-built streamlines exercise each rule; every resulting count is asserted.
+here = fileparts(mfilename('fullpath'));
+addpath(fullfile(fileparts(fileparts(here)),'core'), here);
 if nargin < 1, workdir = fullfile(tempdir, 'icdm_counting_test'); end
 if ~exist(workdir,'dir'), mkdir(workdir); end
 dim = [12 12 12]; M = [eye(3) -ones(3,1); 0 0 0 1];

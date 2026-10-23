@@ -6,7 +6,7 @@ This document specifies what iCDM reads, how streamlines become counts, and what
 
 | Input | Format | Convention |
 |---|---|---|
-| Tractogram | MRtrix `.tck` (vertices in world mm) or TrackVis `.trk` (vertices in voxel units of the label image) | One file per subject (per visit). |
+| Tractogram | MRtrix `.tck` (vertices in world mm). TrackVis `.trk` is read as vertices in voxel units of the label image (not the TrackVis voxmm convention), without per-point scalars or properties; the reported analyses and the examples use `.tck`. | One file per subject (per visit). |
 | Label image | Integer NIfTI | Label value `k` is target channel `k`; `0` is unlabelled. It must be in the same world space as the tractogram, and its grid and affine define the count grid. |
 | Deformation | SPM deformation `y_*.nii` (`[X Y Z 1 3]`, world mm) | Defined on the template grid. Each template voxel stores the subject-space world coordinate it samples. Expected at `<counts folder>/dartel/y_fs_t1.nii`. |
 | Template | NIfTI | Defines the analysis grid (template space). |

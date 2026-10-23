@@ -27,7 +27,7 @@
   "reference": {
     "column": "reference",
     "prior_mode": "pooled",
-    "note": "pooled = one covariate-agnostic prior from all reference visits (required when age is the effect under test); per_age_bin = one prior per template bin (individualized reference only; it encodes age)."
+    "note": "pooled = one covariate-agnostic prior from all reference visits (required when age is the effect under test). Only pooled is implemented in this example; a per-age-bin prior (individualized reference only; it encodes age) would replace this step."
   },
 
   "calibration": {

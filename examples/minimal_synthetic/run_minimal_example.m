@@ -37,7 +37,7 @@ end
 % 2-3. prior and individualized estimates (settings of the reported analyses, K = 6 targets)
 outdir = fullfile(workdir,'icdm'); if ~exist(fullfile(outdir,'subjs'),'dir'), mkdir(fullfile(outdir,'subjs')); end
 targets = info.targets;
-opts.mask_thr = 5; opts.mnionly = false; opts.idx_regions = targets;
+opts.thresh = 5; opts.mnionly = false; opts.idx_regions = targets;
 opts.gamma = 0.35; opts.max_iter = 2; opts.tol = 1e-3; opts.ridge_lambda = 1e-2;
 opts.precision = struct('kappa_base',1.0,'prior_eps2',1e-6,'wbeta_prec',false,'alpha_grp',0.25);
 opts.vb  = struct('max_iter',20,'pcg_iter',20,'tol_grad',1e-6,'tol_step',1e-6,'jitter',1e-6,'init','hybrid','parfor',false);

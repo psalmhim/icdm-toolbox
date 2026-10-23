@@ -17,7 +17,7 @@ S = numel(icdm_files);
 idx_regions = 1:68;                                   % Desikan--Killiany cortical targets
 
 % ---- options (defaults used for the reported analyses) ----------------------------
-opts.mask_thr    = 5;           % native voxel inclusion: >5 streamline--target incidences
+opts.thresh      = 5;           % native voxel inclusion: >5 streamline--target incidences
 opts.label       = 'desikan68';
 opts.mnionly     = false;
 opts.idx_regions = idx_regions;

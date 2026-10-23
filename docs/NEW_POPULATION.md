@@ -50,6 +50,7 @@ Every visit is estimated under the fixed prior with the calibrated `alpha_grp`. 
 derivatives/icdm/
   calibration.json                  alpha_grp, criterion, reference size, fixed settings
   prior/                            population prior (group_icdm_iter_002.mat) and its reference fits
+  final/                            <sub>_<ses>_vb.mat for every visit under the fixed prior and calibrated alpha_grp
   sub-XX/ses-YY/
     counts.nii                      streamline-target incidence counts
     dartel/y_fs_t1.nii              composed deformation to the common space

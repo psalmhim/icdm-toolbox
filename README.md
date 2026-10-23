@@ -20,7 +20,7 @@ iCDM treats the voxelwise streamline--target counts produced by a tractography p
 
 ## Requirements
 
-- MATLAB R2020a or later (Parallel Computing Toolbox optional, for `parfor`)
+- MATLAB R2021a or later (Parallel Computing Toolbox optional, for `parfor`)
 - SPM (SPM12 or SPM25) for NIfTI I/O and deformation fields
 - Tractography and parcellation are upstream of iCDM (e.g. MRtrix3, FreeSurfer) and are not part of this toolbox
 - Simulations: Python 3 with `numpy`, `scipy`, `matplotlib`
